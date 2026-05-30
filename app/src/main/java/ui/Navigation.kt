@@ -28,5 +28,14 @@ fun AppNavigation() {
         composable("create_account") {
             CreateAccountScreen(navController)
         }
+        composable("home") {
+            MainScreen(navController)
+        }
+        composable("auth_check") {
+            AuthCheckScreen(navController)
+        }
+        composable("create_post") {
+            CreatePostScreen(navController)
+        }
     }
     }

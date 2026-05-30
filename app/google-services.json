@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "725615842237",
+    "project_id": "entre-lacos-4b37d",
+    "storage_bucket": "entre-lacos-4b37d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725615842237:android:d8320a08cec0cded72b8d4",
+        "android_client_info": {
+          "package_name": "com.entrelacos.arandu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "725615842237-mmkrgr4oh5besu8i5t0v0kejk0k21fn6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.entrelacos.arandu",
+            "certificate_hash": "e5871f7c4493b7f36df722f19cb6b602f099f8da"
+          }
+        },
+        {
+          "client_id": "725615842237-9f40t646boqk2pc6so2igne0vgem43ur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-lLZawEeAJdT05E9_Gm8T0WxdcMCZFZo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "725615842237-9f40t646boqk2pc6so2igne0vgem43ur.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

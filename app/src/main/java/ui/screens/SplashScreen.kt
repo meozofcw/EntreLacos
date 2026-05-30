@@ -41,7 +41,7 @@ fun SplashScreen(navController: NavController) {
 
         delay(2500)
 
-        navController.navigate("welcome") {
+        navController.navigate("auth_check") {
             popUpTo("splash") {
                 inclusive = true
             }

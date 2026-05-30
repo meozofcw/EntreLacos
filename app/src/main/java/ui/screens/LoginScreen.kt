@@ -1,6 +1,9 @@
 package com.entrelacos.arandu.ui.screens
 
-import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import com.entrelacos.arandu.auth.GoogleAuthManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 import com.entrelacos.arandu.R
 import com.entrelacos.arandu.ui.theme.DarkText
@@ -26,13 +30,15 @@ import com.entrelacos.arandu.ui.theme.PinkMain
 @Composable
 fun LoginScreen(navController: NavController) {
 
-    var email by remember {
-        mutableStateOf("")
-    }
+    var email by remember { mutableStateOf("") }
+    var senha by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    var senha by remember {
-        mutableStateOf("")
-    }
+    val googleAuthManager =
+        remember {
+            GoogleAuthManager(context)
+        }
 
     Column(
         modifier = Modifier
@@ -43,9 +49,8 @@ fun LoginScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp)
+                .height(250.dp)
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.welcome_bg),
                 contentDescription = null,
@@ -62,7 +67,7 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = "Entrar",
@@ -71,21 +76,19 @@ fun LoginScreen(navController: NavController) {
                 color = DarkText
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Entre na sua conta.",
+                text = "Acesse sua conta EntreMães",
                 fontSize = 16.sp,
                 color = DarkText.copy(alpha = 0.7f)
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
                 value = email,
-                onValueChange = {
-                    email = it
-                },
+                onValueChange = { email = it },
 
                 modifier = Modifier.fillMaxWidth(),
 
@@ -102,13 +105,11 @@ fun LoginScreen(navController: NavController) {
                 )
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = senha,
-                onValueChange = {
-                    senha = it
-                },
+                onValueChange = { senha = it },
 
                 modifier = Modifier.fillMaxWidth(),
 
@@ -123,10 +124,12 @@ fun LoginScreen(navController: NavController) {
                 visualTransformation = PasswordVisualTransformation()
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { },
+                onClick = {
+                    navController.navigate("home")
+                },
 
                 modifier = Modifier
                     .fillMaxWidth()
@@ -145,12 +148,107 @@ fun LoginScreen(navController: NavController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "Esqueceu sua senha?",
-                color = PinkMain
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f)
+                )
+
+                Text(
+                    text = "  ou  ",
+                    color = Color.Gray
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            OutlinedButton(
+                onClick = {
+
+                    scope.launch {
+
+                        try {
+
+                            val success =
+                                googleAuthManager.signIn()
+
+                            if (success) {
+
+                                navController.navigate("home") {
+                                    popUpTo("login") {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            ) {
+
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.google_logo
+                    ),
+                    contentDescription = "Google",
+
+                    modifier = Modifier.size(22.dp)
+                )
+
+                Spacer(
+                    modifier = Modifier.width(12.dp)
+                )
+
+                Text(
+                    text = "Continuar com Google",
+                    color = DarkText,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                TextButton(
+                    onClick = {
+                        navController.navigate("create_account")
+                    }
+                ) {
+                    Text(
+                        text = "Criar conta",
+                        color = PinkMain
+                    )
+                }
+
+                TextButton(
+                    onClick = {
+                        // recuperação de senha
+                    }
+                ) {
+                    Text(
+                        text = "Esqueceu a senha?",
+                        color = PinkMain
+                    )
+                }
+            }
+            }
         }
     }
-}
