@@ -66,4 +66,5 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("org.maplibre.gl:android-sdk:11.7.0")
 }
