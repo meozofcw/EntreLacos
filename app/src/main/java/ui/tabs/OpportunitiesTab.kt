@@ -2,7 +2,6 @@ package com.entrelacos.arandu.ui.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -20,12 +19,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.entrelacos.arandu.model.SupportCategory
 import com.entrelacos.arandu.model.SupportPoint
 import com.entrelacos.arandu.repository.SupportPointRepository
 import com.entrelacos.arandu.ui.components.SupportMap
 import com.entrelacos.arandu.ui.theme.DarkText
 import com.entrelacos.arandu.ui.theme.PinkLight
 import com.entrelacos.arandu.ui.theme.PinkMain
+import com.entrelacos.arandu.ui.theme.PinkSoft
 
 data class Course(val title: String, val hours: String)
 data class Job(val title: String, val location: String)
@@ -34,10 +35,16 @@ data class Job(val title: String, val location: String)
 fun OpportunitiesTab() {
 
     val repository = remember { SupportPointRepository() }
-    var supportPoints by remember { mutableStateOf<List<SupportPoint>>(emptyList()) }
+    var allPoints by remember { mutableStateOf<List<SupportPoint>>(emptyList()) }
+    var selectedCategory by remember { mutableStateOf(SupportCategory.ALL) }
 
     LaunchedEffect(Unit) {
-        repository.getSupportPoints { supportPoints = it }
+        repository.getSupportPoints { allPoints = it }
+    }
+
+    val filteredPoints = remember(allPoints, selectedCategory) {
+        if (selectedCategory == SupportCategory.ALL) allPoints
+        else allPoints.filter { it.category == selectedCategory.key }
     }
 
     val courses = listOf(
@@ -54,7 +61,6 @@ fun OpportunitiesTab() {
         Job("Costureira", "Flexível")
     )
 
-    // Column scrollável normal — MapView não funciona dentro de LazyColumn
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +68,6 @@ fun OpportunitiesTab() {
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
     ) {
-
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
@@ -96,11 +101,7 @@ fun OpportunitiesTab() {
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Icon(
-                            imageVector = Icons.Outlined.School,
-                            contentDescription = null,
-                            tint = PinkMain
-                        )
+                        Icon(Icons.Outlined.School, contentDescription = null, tint = PinkMain)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = course.title, fontWeight = FontWeight.Bold, color = DarkText)
                         Text(text = course.hours, color = Color.Gray, fontSize = 12.sp)
@@ -109,9 +110,7 @@ fun OpportunitiesTab() {
                             onClick = {},
                             colors = ButtonDefaults.buttonColors(containerColor = PinkMain),
                             shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("Ver Curso", fontSize = 12.sp)
-                        }
+                        ) { Text("Ver Curso", fontSize = 12.sp) }
                     }
                 }
             }
@@ -130,9 +129,7 @@ fun OpportunitiesTab() {
 
         jobs.forEach { job ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
@@ -141,17 +138,10 @@ fun OpportunitiesTab() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(PinkLight, RoundedCornerShape(10.dp)),
+                        modifier = Modifier.size(40.dp).background(PinkLight, RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.BusinessCenter,
-                            contentDescription = null,
-                            tint = PinkMain,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        Icon(Icons.Outlined.BusinessCenter, contentDescription = null, tint = PinkMain, modifier = Modifier.size(20.dp))
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
@@ -178,39 +168,67 @@ fun OpportunitiesTab() {
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Mapa com altura fixa explícita
+        // Filtros de categoria
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(SupportCategory.values().toList()) { category ->
+                val isSelected = selectedCategory == category
+                FilterChip(
+                    selected = isSelected,
+                    onClick = { selectedCategory = category },
+                    label = {
+                        Text(
+                            text = "${category.emoji} ${category.label}",
+                            fontSize = 12.sp
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = PinkMain,
+                        selectedLabelColor = Color.White,
+                        containerColor = PinkLight,
+                        labelColor = DarkText
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = isSelected,
+                        borderColor = PinkSoft,
+                        selectedBorderColor = PinkMain
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Mapa
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp),
+            modifier = Modifier.fillMaxWidth().height(250.dp),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            SupportMap(supportPoints = supportPoints)
+            SupportMap(supportPoints = filteredPoints)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // Lista de pontos
-        if (supportPoints.isEmpty()) {
+        if (filteredPoints.isEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = PinkLight)
             ) {
                 Text(
-                    text = "Nenhum ponto de apoio cadastrado ainda.",
+                    text = if (allPoints.isEmpty()) "Nenhum ponto cadastrado ainda."
+                    else "Nenhum ponto nessa categoria.",
                     modifier = Modifier.padding(16.dp),
                     color = PinkMain,
                     fontSize = 13.sp
                 )
             }
         } else {
-            supportPoints.forEach { point ->
+            filteredPoints.forEach { point ->
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
@@ -219,16 +237,15 @@ fun OpportunitiesTab() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(PinkLight, RoundedCornerShape(10.dp)),
+                            modifier = Modifier.size(40.dp).background(
+                                categoryColor(point.category),
+                                RoundedCornerShape(10.dp)
+                            ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.LocationOn,
-                                contentDescription = null,
-                                tint = PinkMain,
-                                modifier = Modifier.size(20.dp)
+                            Text(
+                                text = categoryEmoji(point.category),
+                                fontSize = 18.sp
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
@@ -246,6 +263,12 @@ fun OpportunitiesTab() {
                                     fontSize = 11.sp
                                 )
                             }
+                            Text(
+                                text = categoryLabel(point.category),
+                                color = PinkMain,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
@@ -254,4 +277,19 @@ fun OpportunitiesTab() {
 
         Spacer(modifier = Modifier.height(100.dp))
     }
+}
+
+private fun categoryEmoji(category: String): String =
+    SupportCategory.values().find { it.key == category }?.emoji ?: "📍"
+
+private fun categoryLabel(category: String): String =
+    SupportCategory.values().find { it.key == category }?.label ?: ""
+
+private fun categoryColor(category: String): Color = when (category) {
+    "delegacia"        -> Color(0xFFFFEEEE)
+    "assistencia_social" -> Color(0xFFEEF4FF)
+    "saude"            -> Color(0xFFE1F5EE)
+    "juridico"         -> Color(0xFFFAEEDA)
+    "ong"              -> Color(0xFFFFF8E1)
+    else               -> Color(0xFFFDE7EF)
 }

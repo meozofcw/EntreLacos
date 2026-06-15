@@ -6,5 +6,14 @@ data class SupportPoint(
     val description: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val createdAt: Long = 0
+    val category: String = ""
 )
+
+enum class SupportCategory(val key: String, val label: String, val emoji: String) {
+    ALL("", "Todos", "📍"),
+    DELEGACIA("delegacia", "Delegacias", "🚔"),
+    ASSISTENCIA("assistencia_social", "Assistência", "🤝"),
+    SAUDE("saude", "Saúde", "🏥"),
+    JURIDICO("juridico", "Jurídico", "⚖️"),
+    ONG("ong", "ONGs", "💛")
+}
