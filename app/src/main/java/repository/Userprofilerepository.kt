@@ -3,6 +3,7 @@ package com.entrelacos.arandu.repository
 import com.entrelacos.arandu.model.UserProfile
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class UserProfileRepository {
 
@@ -59,7 +60,7 @@ class UserProfileRepository {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         collection.document(uid).set(
             mapOf("photoUrl" to photoUrl),
-            com.google.firebase.firestore.SetOptions.merge()
+            SetOptions.merge()
         )
     }
 

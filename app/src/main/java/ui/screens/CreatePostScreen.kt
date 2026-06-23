@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.entrelacos.arandu.repository.StorageRepository
+import com.entrelacos.arandu.repository.UserProfileRepository
 import com.entrelacos.arandu.ui.components.PostImagePickerField
 import com.entrelacos.arandu.ui.theme.PinkMain
 import com.google.firebase.auth.FirebaseAuth
@@ -28,12 +29,25 @@ fun CreatePostScreen(
     var postText by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var userPhotoUrl by remember { mutableStateOf("") }
+    var userDisplayName by remember { mutableStateOf("") }
 
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
     val storageRepository = remember { StorageRepository() }
+    val profileRepository = remember { UserProfileRepository() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Busca a foto e nome cadastrados no perfil (Supabase), não a do Google
+    LaunchedEffect(Unit) {
+        profileRepository.getProfile { profile ->
+            if (profile != null) {
+                userPhotoUrl = profile.photoUrl
+                if (profile.name.isNotEmpty()) userDisplayName = profile.name
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -89,7 +103,6 @@ fun CreatePostScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Seletor de imagem
             PostImagePickerField(
                 localPreviewUri = selectedImageUri,
                 onImagePicked = { selectedImageUri = it },
@@ -107,7 +120,6 @@ fun CreatePostScreen(
                     val uid = user?.uid ?: ""
 
                     scope.launch {
-                        // Faz upload da imagem se houver uma selecionada
                         val imageUrl = selectedImageUri?.let { uri ->
                             storageRepository.uploadImage(
                                 context = context,
@@ -117,10 +129,14 @@ fun CreatePostScreen(
                             )
                         } ?: ""
 
+                        val finalName = userDisplayName.takeIf { it.isNotEmpty() }
+                            ?: user?.displayName
+                            ?: "Usuário"
+
                         val post = hashMapOf(
                             "userId" to uid,
-                            "userName" to (user?.displayName ?: "Usuário"),
-                            "userPhoto" to (user?.photoUrl?.toString() ?: ""),
+                            "userName" to finalName,
+                            "userPhoto" to userPhotoUrl,
                             "text" to postText,
                             "imageUrl" to imageUrl,
                             "likes" to 0,

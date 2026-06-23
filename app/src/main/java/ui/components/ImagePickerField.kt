@@ -24,10 +24,6 @@ import coil.compose.AsyncImage
 import com.entrelacos.arandu.ui.theme.PinkLight
 import com.entrelacos.arandu.ui.theme.PinkMain
 
-/**
- * Avatar circular clicável que abre a galeria e mostra preview da imagem escolhida.
- * Passa a Uri local escolhida via onImagePicked — o upload é feito por quem usa o componente.
- */
 @Composable
 fun AvatarPickerField(
     currentImageUrl: String?,
@@ -70,7 +66,6 @@ fun AvatarPickerField(
             )
         }
 
-        // Badge de câmera no canto
         Box(
             modifier = Modifier
                 .size((size * 0.32).dp)
@@ -88,9 +83,6 @@ fun AvatarPickerField(
     }
 }
 
-/**
- * Botão quadrado para selecionar foto em um post (não circular).
- */
 @Composable
 fun PostImagePickerField(
     localPreviewUri: Uri?,

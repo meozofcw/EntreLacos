@@ -12,7 +12,7 @@ class StorageRepository {
 
     /**
      * Faz upload de uma imagem da galeria (Uri local) para o Supabase Storage
-     * e retorna a URL pública, ou null em caso de erro.
+     * e retorna a URL pública com cache-buster, ou null em caso de erro.
      *
      * @param bucket "avatars" ou "posts"
      */
@@ -26,6 +26,7 @@ class StorageRepository {
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 ?: return@withContext null
 
+            // Nome de arquivo único por upload — evita qualquer cache de CDN/Coil
             val fileName = "$uid/${UUID.randomUUID()}.jpg"
 
             SupabaseClient.client.storage
@@ -34,9 +35,12 @@ class StorageRepository {
                     upsert = true
                 }
 
-            SupabaseClient.client.storage
+            val publicUrl = SupabaseClient.client.storage
                 .from(bucket)
                 .publicUrl(fileName)
+
+            // Cache-buster: garante que o Coil sempre trate como uma imagem nova
+            "$publicUrl?t=${System.currentTimeMillis()}"
 
         } catch (e: Exception) {
             e.printStackTrace()

@@ -81,7 +81,6 @@ fun ProfileTab(navController: NavController) {
             .verticalScroll(rememberScrollState())
     ) {
 
-        // Header com avatar clicável
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -92,30 +91,34 @@ fun ProfileTab(navController: NavController) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                 Box {
-                    AvatarPickerField(
-                        currentImageUrl = profile?.photoUrl?.takeIf { it.isNotEmpty() },
-                        localPreviewUri = localAvatarUri,
-                        size = 80,
-                        onImagePicked = { uri ->
-                            localAvatarUri = uri
-                            uploadingAvatar = true
+                    // key força recomposição do AsyncImage quando a URL muda
+                    key(profile?.photoUrl) {
+                        AvatarPickerField(
+                            currentImageUrl = profile?.photoUrl?.takeIf { it.isNotEmpty() },
+                            localPreviewUri = localAvatarUri,
+                            size = 80,
+                            onImagePicked = { uri ->
+                                localAvatarUri = uri
+                                uploadingAvatar = true
 
-                            val uid = currentUser?.uid ?: ""
-                            scope.launch {
-                                val url = storageRepository.uploadImage(
-                                    context = context,
-                                    uri = uri,
-                                    bucket = "avatars",
-                                    uid = uid
-                                )
-                                uploadingAvatar = false
-                                if (url != null) {
-                                    repository.updatePhotoUrl(url)
-                                    profile = profile?.copy(photoUrl = url) ?: UserProfile(photoUrl = url)
+                                val uid = currentUser?.uid ?: ""
+                                scope.launch {
+                                    val url = storageRepository.uploadImage(
+                                        context = context,
+                                        uri = uri,
+                                        bucket = "avatars",
+                                        uid = uid
+                                    )
+                                    uploadingAvatar = false
+                                    if (url != null) {
+                                        repository.updatePhotoUrl(url)
+                                        profile = (profile ?: UserProfile()).copy(photoUrl = url)
+                                        localAvatarUri = null
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
 
                     if (uploadingAvatar) {
                         Box(
@@ -152,7 +155,6 @@ fun ProfileTab(navController: NavController) {
 
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // Bio
             if (profile?.bio?.isNotEmpty() == true) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -170,12 +172,10 @@ fun ProfileTab(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Premium
             PremiumCard()
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Dados do filho
             Text(
                 text = "👶 Meu filho(a)",
                 fontWeight = FontWeight.Bold,
@@ -219,11 +219,7 @@ fun ProfileTab(navController: NavController) {
                                 profile!!.childCondition.takeIf { it.isNotEmpty() }
                             ).joinToString(" · ")
                             if (details.isNotEmpty()) {
-                                Text(
-                                    text = details,
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
+                                Text(text = details, fontSize = 12.sp, color = Color.Gray)
                             }
                         }
                     }
@@ -245,7 +241,6 @@ fun ProfileTab(navController: NavController) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Configurações
             Text(
                 text = "⚙️ Configurações",
                 fontWeight = FontWeight.Bold,
@@ -293,9 +288,7 @@ fun ProfileTab(navController: NavController) {
                                 repository.updateNotifications(enabled)
                                 profile = profile?.copy(notificationsEnabled = enabled)
                             },
-                            colors = SwitchDefaults.colors(
-                                checkedTrackColor = PinkMain
-                            )
+                            colors = SwitchDefaults.colors(checkedTrackColor = PinkMain)
                         )
                     }
 
@@ -361,7 +354,7 @@ private fun PremiumCard() {
                 )
                 Spacer(modifier = Modifier.height(14.dp))
                 Button(
-                    onClick = { /* em breve: integração de pagamento */ },
+                    onClick = { },
                     enabled = false,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFFFD700),
@@ -396,10 +389,7 @@ private fun SettingsRow(
             .background(Color.Transparent),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(
-            onClick = onClick,
-            contentPadding = PaddingValues(0.dp)
-        ) {
+        TextButton(onClick = onClick, contentPadding = PaddingValues(0.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     imageVector = icon,
@@ -433,9 +423,7 @@ private fun EditProfileDialog(
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .verticalScroll(rememberScrollState())
+                modifier = Modifier.padding(20.dp).verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = "Editar perfil",
