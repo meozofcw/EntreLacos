@@ -226,6 +226,22 @@ fun CommunityTab(
                             text = post.text
                         )
 
+                        if (post.imageUrl.isNotEmpty()) {
+                            Spacer(
+                                modifier = Modifier.height(12.dp)
+                            )
+
+                            AsyncImage(
+                                model = post.imageUrl,
+                                contentDescription = "Imagem da publicação",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(220.dp)
+                                    .clip(RoundedCornerShape(14.dp)),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                            )
+                        }
+
                         Spacer(
                             modifier = Modifier.height(16.dp)
                         )

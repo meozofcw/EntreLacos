@@ -1,5 +1,6 @@
 package com.entrelacos.arandu.ui.tabs
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.outlined.ChildCare
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Logout
@@ -16,7 +18,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -24,20 +28,28 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.entrelacos.arandu.model.UserProfile
+import com.entrelacos.arandu.repository.StorageRepository
 import com.entrelacos.arandu.repository.UserProfileRepository
+import com.entrelacos.arandu.ui.components.AvatarPickerField
 import com.entrelacos.arandu.ui.theme.DarkText
 import com.entrelacos.arandu.ui.theme.PinkLight
 import com.entrelacos.arandu.ui.theme.PinkMain
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileTab(navController: NavController) {
 
     val repository = remember { UserProfileRepository() }
+    val storageRepository = remember { StorageRepository() }
     val currentUser = FirebaseAuth.getInstance().currentUser
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var profile by remember { mutableStateOf<UserProfile?>(null) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var localAvatarUri by remember { mutableStateOf<Uri?>(null) }
+    var uploadingAvatar by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         repository.getProfile { profile = it }
@@ -46,8 +58,6 @@ fun ProfileTab(navController: NavController) {
     val displayName = profile?.name?.takeIf { it.isNotEmpty() }
         ?: currentUser?.email?.substringBefore("@")
         ?: "Mãe EntreLaços"
-
-    val initial = displayName.take(1).uppercase()
 
     if (showEditDialog) {
         EditProfileDialog(
@@ -71,7 +81,7 @@ fun ProfileTab(navController: NavController) {
             .verticalScroll(rememberScrollState())
     ) {
 
-        // Header com avatar
+        // Header com avatar clicável
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -80,19 +90,49 @@ fun ProfileTab(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .background(Color.White, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = initial,
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PinkMain
+
+                Box {
+                    AvatarPickerField(
+                        currentImageUrl = profile?.photoUrl?.takeIf { it.isNotEmpty() },
+                        localPreviewUri = localAvatarUri,
+                        size = 80,
+                        onImagePicked = { uri ->
+                            localAvatarUri = uri
+                            uploadingAvatar = true
+
+                            val uid = currentUser?.uid ?: ""
+                            scope.launch {
+                                val url = storageRepository.uploadImage(
+                                    context = context,
+                                    uri = uri,
+                                    bucket = "avatars",
+                                    uid = uid
+                                )
+                                uploadingAvatar = false
+                                if (url != null) {
+                                    repository.updatePhotoUrl(url)
+                                    profile = profile?.copy(photoUrl = url) ?: UserProfile(photoUrl = url)
+                                }
+                            }
+                        }
                     )
+
+                    if (uploadingAvatar) {
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .background(Color.Black.copy(alpha = 0.4f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(28.dp),
+                                color = Color.White,
+                                strokeWidth = 3.dp
+                            )
+                        }
+                    }
                 }
+
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = displayName,
@@ -129,6 +169,11 @@ fun ProfileTab(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
+
+            // Premium
+            PremiumCard()
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Dados do filho
             Text(
@@ -223,7 +268,6 @@ fun ProfileTab(navController: NavController) {
 
                     HorizontalDivider(color = Color(0xFFF0E0E5))
 
-                    // Notificações com switch
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -272,6 +316,68 @@ fun ProfileTab(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(100.dp))
+        }
+    }
+}
+
+@Composable
+private fun PremiumCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(Color(0xFF413E51), Color(0xFF6B5B73))
+                    )
+                )
+                .padding(18.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.WorkspacePremium,
+                        contentDescription = null,
+                        tint = Color(0xFFFFD700),
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "EntreLaços Premium",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 15.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Conteúdo exclusivo, trilhas avançadas e suporte prioritário para você e seu filho.",
+                    color = Color.White.copy(alpha = 0.85f),
+                    fontSize = 12.sp,
+                    lineHeight = 17.sp
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                Button(
+                    onClick = { /* em breve: integração de pagamento */ },
+                    enabled = false,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFFD700),
+                        disabledContainerColor = Color(0xFFFFD700).copy(alpha = 0.6f)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Em breve",
+                        color = Color(0xFF413E51),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+            }
         }
     }
 }

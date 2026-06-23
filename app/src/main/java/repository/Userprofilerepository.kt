@@ -21,6 +21,7 @@ class UserProfileRepository {
                 val profile = UserProfile(
                     uid = uid,
                     name = doc.getString("name") ?: "",
+                    photoUrl = doc.getString("photoUrl") ?: "",
                     bio = doc.getString("bio") ?: "",
                     city = doc.getString("city") ?: "",
                     notificationsEnabled = doc.getBoolean("notificationsEnabled") ?: true,
@@ -40,6 +41,7 @@ class UserProfileRepository {
 
         val data = mapOf(
             "name" to profile.name,
+            "photoUrl" to profile.photoUrl,
             "bio" to profile.bio,
             "city" to profile.city,
             "notificationsEnabled" to profile.notificationsEnabled,
@@ -51,6 +53,14 @@ class UserProfileRepository {
         collection.document(uid).set(data)
             .addOnSuccessListener { onComplete(true) }
             .addOnFailureListener { onComplete(false) }
+    }
+
+    fun updatePhotoUrl(photoUrl: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        collection.document(uid).set(
+            mapOf("photoUrl" to photoUrl),
+            com.google.firebase.firestore.SetOptions.merge()
+        )
     }
 
     fun updateNotifications(enabled: Boolean) {

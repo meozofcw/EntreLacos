@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -69,4 +70,11 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("org.maplibre.gl:android-sdk:11.7.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // Supabase Storage para fotos
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
+    implementation("io.github.jan-tennert.supabase:storage-kt")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.ktor:ktor-client-android:3.0.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }
