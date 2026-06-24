@@ -1,7 +1,7 @@
 # 💕 EntreLaços — MVP
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-MVP-pink?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Status-MVP%20Finalizado-pink?style=for-the-badge">
   <img src="https://img.shields.io/badge/Plataforma-Android-ff69b4?style=for-the-badge">
   <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-e91e63?style=for-the-badge">
 </p>
@@ -10,15 +10,20 @@
   <b>Conectando mães, famílias e oportunidades em uma única plataforma.</b>
 </p>
 
+<p align="center">
+  🏆 Projeto desenvolvido para o <b>Desafio Liga Jovem 4 (DLJ4) — SEBRAE</b><br>
+  Desenvolvido pela equipe <b>Arandu LABS</b>
+</p>
+
 ---
 
 ## 🌸 Sobre o Projeto
 
-O **EntreLaços** é uma plataforma digital desenvolvida para conectar mães, responsáveis e famílias em uma rede de apoio acolhedora, inclusiva e acessível.
+O **EntreLaços** é uma plataforma digital desenvolvida para conectar mães, responsáveis e famílias em uma rede de apoio acolhedora, inclusiva e acessível — com foco especial em mães atípicas, solteiras e em situação de vulnerabilidade.
 
 O projeto surgiu da necessidade de reunir em um único ambiente informações, oportunidades e serviços que atualmente se encontram dispersos entre grupos de mensagens, redes sociais e instituições.
 
-> 💡 Este projeto encontra-se na fase de **MVP (Minimum Viable Product)**, desenvolvido para validar a proposta, testar funcionalidades e coletar feedback dos usuários.
+> ✅ Este projeto chega à sua versão de **MVP finalizado**, com todas as funcionalidades centrais implementadas, testadas e validadas. O EntreLaços está pronto para validação com usuárias reais e coleta de feedback.
 
 ---
 
@@ -42,7 +47,7 @@ O EntreLaços centraliza recursos essenciais em um único aplicativo.
 
 ### 👩‍👩‍👧 Comunidade
 
-- Feed de publicações.
+- Feed de publicações com fotos.
 - Compartilhamento de experiências.
 - Rede de apoio entre famílias.
 - Ambiente seguro e acolhedor.
@@ -56,15 +61,21 @@ O EntreLaços centraliza recursos essenciais em um único aplicativo.
 
 ### 📍 Rede de Apoio
 
-- UBS.
-- Delegacias da Mulher.
-- CRAS.
-- APAEs.
-- Centros especializados.
+Mapa interativo com pontos de apoio reais, organizados por categoria:
 
-### 🧩 Mundo Sensorial
+- Delegacias da Mulher (DEAM)
+- CRAS / CREAS
+- UPAs e unidades de saúde
+- Defensoria Pública e Ministério Público
+- ONGs parceiras
 
-Área dedicada ao desenvolvimento infantil com atividades e recursos voltados para crianças e famílias.
+### 🧩 Espaço Sensorial
+
+Área dedicada ao desenvolvimento de crianças neurodivergentes, com vídeos e atividades interativas organizadas por categoria (comunicação, emoções, sensorial, cognitivo), avaliadas pela própria comunidade de mães.
+
+### 💎 EntreLaços Premium
+
+Tela dedicada com benefícios exclusivos — consultas médicas facilitadas, telemedicina, cursos profissionalizantes e conteúdos extras — com planos mensal, anual e day use.
 
 ---
 
@@ -72,23 +83,25 @@ O EntreLaços centraliza recursos essenciais em um único aplicativo.
 
 ### ✅ Implementadas
 
-- Login com Google
+- Login com Google e e-mail/senha
 - Cadastro de usuários
 - Persistência de sessão
 - Navegação por abas
-- Feed comunitário
+- Feed comunitário com upload de fotos
 - Criação de publicações
-- Perfil do usuário
+- Perfil completo com foto, bio e dados do filho(a)
+- Mapa de Rede de Apoio com filtro por categoria
+- Espaço Sensorial com avaliação por estrelas
+- Tela Premium com planos e benefícios
 - Firebase Authentication
 - Firebase Firestore
+- Supabase Storage (upload de imagens)
 
-### 🔄 Em Desenvolvimento
+### 🔄 Próxima Fase (pós-MVP)
 
-- Upload de imagens
-- Curtidas
-- Comentários
-- Mapa interativo
-- Sistema de notificações
+- Curtidas e comentários no feed
+- Integração de pagamento do Premium
+- Sistema de notificações push
 - Recomendações personalizadas
 
 ---
@@ -103,12 +116,15 @@ EntreLaços
 ├── Home
 │   ├── Comunidade
 │   ├── Oportunidades
-│   ├── Mundo Sensorial
+│   │   └── Rede de Apoio (mapa)
+│   ├── Espaço Sensorial
 │   └── Perfil
+│       └── Premium
 │
 ├── Publicações
 ├── Firebase Auth
-└── Firestore
+├── Firestore
+└── Supabase Storage
 ```
 
 ## 🛠️ Tecnologias Utilizadas
@@ -119,6 +135,7 @@ EntreLaços
 | Jetpack Compose | Interface moderna |
 | Firebase Authentication | Login e autenticação |
 | Firebase Firestore | Banco de dados |
+| Supabase Storage | Upload e hospedagem de imagens |
 | OpenStreetMap | Dados geográficos |
 | MapLibre | Mapa interativo |
 | Material Design 3 | Design System |
@@ -129,12 +146,12 @@ EntreLaços
 
 ### Paleta Principal
 
-| Cor | Uso |
-|------|------|
-| 🩷 Rosa Principal | Destaques |
-| 🤍 Branco | Fundo |
-| 🌸 Rosa Claro | Elementos secundários |
-| 💜 Lilás Suave | Inclusão e acessibilidade |
+| Cor | Hex | Uso |
+|------|------|------|
+| 🩷 Rosa Principal | `#FF5E76` | Destaques e ações |
+| 🌸 Rosa Claro | `#FDE7EF` | Fundos e elementos secundários |
+| 💗 Rosa Suave | `#FFB5C0` | Elementos de apoio |
+| 🖤 Cinza-escuro | `#413E51` | Textos e contraste |
 
 ### Valores da Marca
 
@@ -146,30 +163,19 @@ EntreLaços
 
 ---
 
-## 📈 Próximos Passos
-
-- Upload de fotos em publicações
-- Curtidas e comentários
-- Sistema de mensagens
-- Geolocalização em tempo real
-- Mapa de serviços públicos
-- Cursos integrados
-- Área para profissionais parceiros
-- Gamificação da comunidade
-
----
-
 ## 🌎 Impacto Social
 
 O EntreLaços busca fortalecer redes de apoio, ampliar o acesso à informação e promover inclusão social por meio da tecnologia.
 
-Nosso objetivo é criar um ambiente seguro, acolhedor e acessível para mães, responsáveis e famílias que buscam apoio, oportunidades e desenvolvimento.
+Nosso objetivo é criar um ambiente seguro, acolhedor e acessível para mães, responsáveis e famílias que buscam apoio, oportunidades e desenvolvimento — com atenção especial às mães de crianças neurodivergentes.
 
 ---
 
 ## 🏆 Projeto Desenvolvido Para
 
-**Desafio Liga Jovem - SEBRAE**
+**Desafio Liga Jovem 4 (DLJ4) — SEBRAE**
+
+Desenvolvido pela equipe **Arandu LABS**
 
 ---
 
