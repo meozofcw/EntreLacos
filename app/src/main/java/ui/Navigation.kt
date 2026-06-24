@@ -37,5 +37,8 @@ fun AppNavigation() {
         composable("create_post") {
             CreatePostScreen(navController)
         }
+        composable("premium") {
+            PremiumScreen(navController)
+        }
     }
-    }
+}

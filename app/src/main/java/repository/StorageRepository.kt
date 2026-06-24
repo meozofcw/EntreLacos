@@ -2,6 +2,7 @@ package com.entrelacos.arandu.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.entrelacos.arandu.data.SupabaseClient
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +40,13 @@ class StorageRepository {
                 .from(bucket)
                 .publicUrl(fileName)
 
+            Log.d("UPLOAD_DEBUG", "URL gerada pelo SDK: $publicUrl")
+
             // Cache-buster: garante que o Coil sempre trate como uma imagem nova
-            "$publicUrl?t=${System.currentTimeMillis()}"
+            val finalUrl = "$publicUrl?t=${System.currentTimeMillis()}"
+            Log.d("UPLOAD_DEBUG", "URL final com cache-buster: $finalUrl")
+
+            finalUrl
 
         } catch (e: Exception) {
             e.printStackTrace()

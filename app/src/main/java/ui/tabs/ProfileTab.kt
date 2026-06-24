@@ -2,6 +2,7 @@ package com.entrelacos.arandu.ui.tabs
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.outlined.ChildCare
 import androidx.compose.material.icons.outlined.Edit
@@ -172,7 +174,7 @@ fun ProfileTab(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            PremiumCard()
+            PremiumCard(onClick = { navController.navigate("premium") })
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -314,9 +316,11 @@ fun ProfileTab(navController: NavController) {
 }
 
 @Composable
-private fun PremiumCard() {
+private fun PremiumCard(onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp)
     ) {
         Box(
@@ -329,47 +333,41 @@ private fun PremiumCard() {
                 )
                 .padding(18.dp)
         ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.WorkspacePremium,
-                        contentDescription = null,
-                        tint = Color(0xFFFFD700),
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.WorkspacePremium,
+                            contentDescription = null,
+                            tint = Color(0xFFFFD700),
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "EntreLaços Premium",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 15.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "EntreLaços Premium",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        fontSize = 15.sp
+                        text = "Consultas médicas, telemedicina e cursos profissionalizantes para você.",
+                        color = Color.White.copy(alpha = 0.85f),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Conteúdo exclusivo, trilhas avançadas e suporte prioritário para você e seu filho.",
-                    color = Color.White.copy(alpha = 0.85f),
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp)
                 )
-                Spacer(modifier = Modifier.height(14.dp))
-                Button(
-                    onClick = { },
-                    enabled = false,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFD700),
-                        disabledContainerColor = Color(0xFFFFD700).copy(alpha = 0.6f)
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Em breve",
-                        color = Color(0xFF413E51),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    )
-                }
             }
         }
     }
